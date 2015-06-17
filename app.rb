@@ -31,7 +31,13 @@ def authenticate!
 end
 
 get '/' do
-  erb :index
+  title = Meetup.all
+  erb :index, locals: { title: title }
+end
+
+get '/:id' do
+  meetup = Meetup.find(params[:id])
+  erb :view, locals: { meetup: meetup }
 end
 
 get '/auth/github/callback' do
