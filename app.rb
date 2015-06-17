@@ -19,6 +19,7 @@ helpers do
   end
 end
 
+
 def set_current_user(user)
   session[:user_id] = user.id
 end
@@ -38,6 +39,21 @@ end
 get '/:id' do
   meetup = Meetup.find(params[:id])
   erb :view, locals: { meetup: meetup }
+end
+
+post '/join_meetup' do
+
+  if MeetupAttendee.find_by(user_id: session[:user_id], meetup_id: params["id"]) == nil
+    user_attending = MeetupAttendee.new(user_id: session[:user_id], meetup_id: params["id"], owner: false)
+    if user_attending.save
+      redirect '/'
+    else
+      flash[:notice] = "Oh no you ain't"
+    end
+  else
+    flash[:notice] = "Unless you have cloned yourself, you cannot attend twice."
+  end
+  
 end
 
 get '/auth/github/callback' do

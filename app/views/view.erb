@@ -2,3 +2,9 @@
 Date: <%= meetup.date %> <br><br>
 Location: <%= meetup.location %> <br><br>
 Description: <%= meetup.description %>
+<br><br>
+Join Meetup: <%= meetup.name %> <br> <br>
+
+<form action="/join_meetup" method="post">
+<button name="id" value="<%= meetup.id %>" type="submit">Join Meetup!</button>
+</form>
