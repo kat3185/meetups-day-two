@@ -16,6 +16,6 @@ class User < ActiveRecord::Base
     )
   end
 
-  has_many :meetupowners
-  has_many :meetups, through: :meetupowners
+  has_many :meetup_attendees
+  has_many :meetups, through: :meetup_attendees
 end

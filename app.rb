@@ -38,7 +38,10 @@ end
 
 get '/:id' do
   meetup = Meetup.find(params[:id])
+
   erb :view, locals: { meetup: meetup }
+
+
 end
 
 post '/join_meetup' do
@@ -53,7 +56,7 @@ post '/join_meetup' do
   else
     flash[:notice] = "Unless you have cloned yourself, you cannot attend twice."
   end
-  
+
 end
 
 get '/auth/github/callback' do
@@ -81,6 +84,7 @@ post '/create_meetup' do
   meetup = Meetup.new(params["meetup"])
 
   if meetup.save
+    MeetupAttendee.create(user_id: session[:user_id], meetup_id: meetup.id, owner: true)
     redirect '/'
   else
     flash[:notice] = 'I am unable to create that meetup!'

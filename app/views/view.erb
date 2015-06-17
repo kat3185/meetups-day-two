@@ -5,6 +5,11 @@ Description: <%= meetup.description %>
 <br><br>
 Join Meetup: <%= meetup.name %> <br> <br>
 
+People Attending: <% meetup.users.each do |user| %>
+<p><%= user.username %></p>
+<% end %>
+
+
 <form action="/join_meetup" method="post">
 <button name="id" value="<%= meetup.id %>" type="submit">Join Meetup!</button>
 </form>
