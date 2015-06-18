@@ -30,10 +30,14 @@ def authenticate!
   end
 end
 
+def user_attending(meetup)
+  MeetupAttendee.find_by(user_id: session[:user_id], meetup_id: meetup.id).present?
+end
+
 get '/' do
   title = ["You must log in to view this page"]
   if signed_in?
-    title = Meetup.all
+    title = Meetup.all.sort_by { |meetup| meetup.name }
   end
   erb :index, locals: { title: title }
 end
@@ -43,7 +47,7 @@ post '/join_meetup' do
   if MeetupAttendee.find_by(user_id: session[:user_id], meetup_id: params["id"]) == nil
     user_attending = MeetupAttendee.new(user_id: session[:user_id], meetup_id: params["id"], owner: false)
     if user_attending.save
-      redirect '/'
+      redirect "/#{params[:id]}"
     else
       flash[:notice] = "Oh no you ain't"
     end
@@ -52,6 +56,18 @@ post '/join_meetup' do
   end
 
 end
+
+post '/leave_meetup' do
+
+  if MeetupAttendee.find_by(user_id: session[:user_id], meetup_id: params[:id]).destroy
+    flash[:notice] = "You have left the group."
+    redirect "/#{params[:id]}"
+  else
+    flash[:notice] = "You can never leave this group!"
+    redirect "/#{params[:id]}"
+  end
+end
+
 
 get '/auth/github/callback' do
   auth = env['omniauth.auth']
@@ -84,6 +100,7 @@ post '/create_meetup' do
 
   if meetup.save
     MeetupAttendee.create(user_id: session[:user_id], meetup_id: meetup.id, owner: true)
+    flash[:notice] = "Your meetup has been created!"
     redirect '/'
   else
     flash[:notice] = 'I am unable to create that meetup!'
