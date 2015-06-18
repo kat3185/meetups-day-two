@@ -19,7 +19,6 @@ helpers do
   end
 end
 
-
 def set_current_user(user)
   session[:user_id] = user.id
 end
@@ -32,16 +31,11 @@ def authenticate!
 end
 
 get '/' do
-  title = Meetup.all
+  title = ["You must log in to view this page"]
+  if signed_in?
+    title = Meetup.all
+  end
   erb :index, locals: { title: title }
-end
-
-get '/:id' do
-  meetup = Meetup.find(params[:id])
-
-  erb :view, locals: { meetup: meetup }
-
-
 end
 
 post '/join_meetup' do
@@ -74,6 +68,11 @@ get '/sign_out' do
   flash[:notice] = "You have been signed out."
 
   redirect '/'
+end
+
+get '/:id' do
+  meetup = Meetup.find(params[:id])
+  erb :view, locals: { meetup: meetup }
 end
 
 get '/example_protected_page' do

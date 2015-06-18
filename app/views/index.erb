@@ -1,35 +1,40 @@
 
-<% title.each do |meetup| %>
-  <h1>Meetup: <a href="/<%= meetup.id %>"><%= meetup.name %> </a></h1>
-  <h3> At: <%= meetup.location %> </h3>
+
+<% if signed_in? %>
+  <% title.each do |meetup| %>
+    <h1>Meetup: <a href="/<%= meetup.id %>"><%= meetup.name %> </a></h1>
+    <h3> At: <%= meetup.location %> </h3>
   <% end %>
 
 
 
 
 
-<h1>Add Meetup</h1>
+  <h1>Add Meetup</h1>
 
-<form action="/create_meetup" method="post">
-  <div>
-    <label for="name">Name:</label>
-    <input type="text" id="form_text" name="meetup[name]">
-  </div>
+  <form action="/create_meetup" method="post">
+    <div>
+      <label for="name">Name:</label>
+      <input type="text" id="form_text" name="meetup[name]">
+    </div>
 
-  <div>
-    <label for="location">Location:</label>
-    <input type="text" id="form_text" name="meetup[location]">
-  </div>
+    <div>
+      <label for="location">Location:</label>
+      <input type="text" id="form_text" name="meetup[location]">
+    </div>
 
-  <div>
-    <label for="description">Description:</label>
-    <textarea id="form_text" name="meetup[description]"></textarea>
-  </div>
+    <div>
+      <label for="description">Description:</label>
+      <textarea id="form_text" name="meetup[description]"></textarea>
+    </div>
 
-  <div>
-    <label for="date">Date:</label>
-    <input type="text" id="form_text" name="meetup[date]">
-  </div>
+    <div>
+      <label for="date">Date:</label>
+      <input type="text" id="form_text" name="meetup[date]">
+    </div>
 
-  <input type="submit" value="Add Meetup">
-</form>
+    <input type="submit" value="Add Meetup">
+  </form>
+<%else%>
+  <%= title[0] %>
+<% end %>
