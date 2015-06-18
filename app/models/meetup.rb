@@ -1,5 +1,6 @@
 class Meetup < ActiveRecord::Base
   has_many :meetup_attendees
+  has_many :comments
   has_many :users, through: :meetup_attendees
 
   validates :name, presence: true

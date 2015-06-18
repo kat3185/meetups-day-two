@@ -34,40 +34,38 @@ def user_attending(meetup)
   MeetupAttendee.find_by(user_id: session[:user_id], meetup_id: meetup.id).present?
 end
 
-get '/' do
-  title = ["You must log in to view this page"]
-  if signed_in?
-    title = Meetup.all.sort_by { |meetup| meetup.name }
+def add_user_to_meetup(meetup_id)
+  user_attending = MeetupAttendee.new(user_id: session[:user_id], meetup_id: meetup_id)
+  if user_attending.save
+    flash[:notice] = "We're glad you're coming!"
+  else
+    flash[:notice] = "You must sign in to attend a meetup!"
   end
+end
+
+get '/' do
+  title = Meetup.all.sort_by { |meetup| meetup.name }
   erb :index, locals: { title: title }
 end
 
 post '/join_meetup' do
-
-  if MeetupAttendee.find_by(user_id: session[:user_id], meetup_id: params["id"]) == nil
-    user_attending = MeetupAttendee.new(user_id: session[:user_id], meetup_id: params["id"], owner: false)
-    if user_attending.save
-      redirect "/#{params[:id]}"
-    else
-      flash[:notice] = "Oh no you ain't"
-    end
+  if MeetupAttendee.find_by(user_id: session[:user_id], meetup_id: params[:id]) == nil
+    add_user_to_meetup(params[:id])
   else
     flash[:notice] = "Unless you have cloned yourself, you cannot attend twice."
   end
-
+  redirect "/#{params[:id]}"
 end
 
 post '/leave_meetup' do
-
   if MeetupAttendee.find_by(user_id: session[:user_id], meetup_id: params[:id]).destroy
     flash[:notice] = "You have left the group."
-    redirect "/#{params[:id]}"
   else
     flash[:notice] = "You can never leave this group!"
-    redirect "/#{params[:id]}"
   end
-end
 
+  redirect "/#{params[:id]}"
+end
 
 get '/auth/github/callback' do
   auth = env['omniauth.auth']
@@ -88,7 +86,10 @@ end
 
 get '/:id' do
   meetup = Meetup.find(params[:id])
-  erb :view, locals: { meetup: meetup }
+  session[:meetup_id] = params[:id]
+  # meetup_comments = Comment.find_by(meetup_id: params[:id])
+  # meetup_comments = meetup_comments.sort_by { |comment| comment.id }
+  erb :view, locals: { meetup: meetup}
 end
 
 get '/example_protected_page' do
@@ -105,4 +106,14 @@ post '/create_meetup' do
   else
     flash[:notice] = 'I am unable to create that meetup!'
   end
+end
+
+post '/create_comment' do
+  comment = Comment.new(body: params[:comment][:body], meetup_id: params[:comment][:meetup_id], user_id: session[:user_id], title: params[:comment][:title])
+  if comment.save
+    flash[:notice] = "Your comment has been saved!"
+  else
+    flash[:notice] = "Your comment was NOT saved.  Haha."
+  end
+  redirect "/#{params[:comment][:meetup_id]}"
 end

@@ -1,22 +1,48 @@
 <h3><%= meetup.name %> Meetup</h3><br>
-Date: <%= meetup.date %> <br><br>
-Location: <%= meetup.location %> <br><br>
-Description: <%= meetup.description %>
-<br><br>
-
+<ul>
+  <li>Date: <%= meetup.date %> <br><br></li>
+  <li>Location: <%= meetup.location %> <br><br></li>
+  <li>Description: <%= meetup.description %></li>
+</ul>
+<br>
 
 <% if user_attending(meetup) %>
   <form action="/leave_meetup" method="post">
     <button name="id" value="<%= meetup.id %>" type="submit">Leave Meetup! <%= meetup.name %></button>
+  </form>
+  <br><br>
+  <form action="/create_comment" method="post">
+    <div>
+      <label for="title">Title:</label>
+      <input type="text" id="form_text" name="comment[title]">
+    </div>
+
+    <div>
+      <label for="body">Body:</label>
+      <textarea id="form_text" name="comment[body]"></textarea>
+    </div>
+
+    <input type="hidden" name="comment[meetup_id]" value="<%= meetup.id %>">
+
+    <input type="submit" value="Add Comment">
   </form>
 <%else%>
   <form action="/join_meetup" method="post">
     <button name="id" value="<%= meetup.id %>" type="submit">Join Meetup! <%= meetup.name %> </button>
   </form>
 <% end %>
- <br> <br>
+<br><br>
+Comments:<br><br>
+
+
+<% meetup.comments.reverse.each do |comment| %>
+<li><%= comment.user.username %> says:
+
+<%= comment.title %>
+<ul><%= comment.body %></ul></li>
+<% end %>
+<br>
 People Attending: <% meetup.users.each do |user| %>
 <p><img src="<%= user.avatar_url %>" style="width:100px;height:100px;"><br>
   <%= user.username %></p>
-
 <% end %>
